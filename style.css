@@ -455,6 +455,7 @@ body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
   .prog::before,.d-compact .prog::before,.d-fit .prog::before{width:2px}
   .slot.one .prog{font-size:8px;line-height:1.2;padding:1px 1px 1px 3px}   /* 1マスだけの番組名：字の大きさは app.js の fitOne() が 8・6・4px から選ぶ */
   .empty,.d-compact .empty,.d-fit .empty{min-height:calc(var(--rowh) - 3px)}
+  .grid-wrap:has(.lgrid){max-height:none}   /* 深夜の表は高さを切らずに全部出す（縦はページごとスクロール、横だけ表の中でスクロール） */
   .lgrid,body.d-compact .lgrid,body.d-fit .lgrid{--lcolw:62px;--lrowh:30px}
   .lgrid .ly{font-size:11px}
   .lgrid .lq{font-size:8px}
