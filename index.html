@@ -17,20 +17,27 @@
       <span class="brand-kicker">ANIME ON AIR</span>
       <h1>アニメ放送枠タイムテーブル</h1>
     </div>
+    <nav class="controls" aria-label="表の切り替え">
+      <div class="seg" id="kind" role="tablist"></div>
+      <div class="tabs" id="decade" role="tablist"></div>
+    </nav>
     <label class="search">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
       <input id="q" type="search" placeholder="番組名でさがす" autocomplete="off">
     </label>
   </div>
-  <nav class="controls" aria-label="表の切り替え">
-    <div class="seg" id="kind" role="tablist"></div>
-    <div class="tabs" id="decade" role="tablist"></div>
-  </nav>
 </header>
 
 <main>
-  <section class="summary" id="summary"></section>
-  <div class="legend" id="legend" aria-label="局で絞り込む"></div>
+  <div class="bar">
+    <section class="summary" id="summary"></section>
+    <div class="legend" id="legend" aria-label="局で絞り込む"></div>
+    <div class="density" id="density" role="radiogroup" aria-label="表示の密度">
+      <button data-d="std" aria-checked="false" role="radio">標準</button>
+      <button data-d="compact" aria-checked="true" role="radio">コンパクト</button>
+      <button data-d="fit" aria-checked="false" role="radio">全体</button>
+    </div>
+  </div>
   <div class="grid-wrap" id="gridWrap">
     <div class="grid" id="grid"></div>
   </div>

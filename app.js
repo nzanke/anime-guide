@@ -4,6 +4,26 @@
   const ACCENT = {'テレビ朝日':'--a-ex','日本テレビ':'--a-nt','TBS':'--a-tb','フジテレビ':'--a-cx','テレビ東京':'--a-tx','NHK':'--a-nh'};
   const KIND_NOTE = {'ゴールデン':'19:00・19:30 の枠', '朝・夕方':'19時より前（朝・昼・夕方）の枠'};
   let D, cur, hidden = new Set();
+  let density = 'compact';
+  try { density = localStorage.getItem('density') || 'compact'; } catch (e) {}
+  const setDensity = d => {
+    density = d;
+    document.body.classList.remove('d-std', 'd-compact', 'd-fit');
+    document.body.classList.add('d-' + d);
+    document.querySelectorAll('#density button').forEach(b => b.setAttribute('aria-checked', b.dataset.d === d));
+    try { localStorage.setItem('density', d); } catch (e) {}
+    fit();
+  };
+  function fit() {
+    const g = $('#grid'); if (!cur) return;
+    if (density !== 'fit') { g.style.removeProperty('--colw'); return; }
+    const cs = getComputedStyle(document.body);
+    const fixed = parseFloat(cs.getPropertyValue('--dayw')) + parseFloat(cs.getPropertyValue('--timew'));
+    const ncol = (cur.y1 - cur.y0 + 1) * 2;
+    const w = Math.max(30, Math.floor(($('#gridWrap').clientWidth - fixed - 2) / ncol));
+    g.style.setProperty('--colw', w + 'px');
+  }
+  window.addEventListener('resize', fit);
 
   const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const fmt = s => { if (!s) return '放送中'; const [y,m,d] = s.split('-').map(Number); return `${y}年${m}月${d}日`; };
@@ -16,6 +36,7 @@
     cur = tableOf(id) || D.tables[0];
     buildLegend();
     render();
+    setDensity(density);
   });
 
   function buildNav() {
@@ -24,6 +45,9 @@
     const ts = D.tables.filter(t => t.kind === cur.kind);
     $('#decade').innerHTML = ts.map(t => `<button role="tab" aria-selected="${t === cur}" data-t="${t.id}">${esc(t.label)}</button>`).join('');
   }
+  $('#density').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (b) setDensity(b.dataset.d);
+  });
   $('#kind').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     const k = b.dataset.k; if (k === cur.kind) return;
@@ -94,6 +118,7 @@
       i = j;
     }
     g.innerHTML = H.join('');
+    fit();
     $('#gridWrap').scrollTo(0, 0);
     // 入らなかった番組
     $('#outCount').textContent = `（${cur.out.length}本）`;
