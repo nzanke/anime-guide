@@ -11,6 +11,8 @@
   --c-cx:#d4ecce; --a-cx:#33923a;   /* フジテレビ */
   --c-tx:#e6d9fa; --a-tx:#8152cf;   /* テレビ東京 */
   --c-nh:#e1e1df; --a-nh:#6d6d6a;   /* NHK */
+  --c-mx:#cdece6; --a-mx:#1d8a7f;   /* TOKYO MX */
+  --c-tk:#f1e2c2; --a-tk:#a26f12;   /* テレビ神奈川 */
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -168,3 +170,28 @@ body.d-fit{--rowh:34px}
   .sheet-card{left:0;right:0;bottom:0;top:auto;width:100%;border-radius:16px 16px 0 0;max-height:75vh}
   .results{top:118px;right:16px}
 }
+
+/* 全日帯と深夜帯のページの行き来 */
+.seg a{all:unset;cursor:pointer;padding:5px 16px;border-radius:7px;font-size:14px;font-weight:700;color:#c9cbd2;white-space:nowrap}
+.seg a[aria-current=page]{background:var(--accent);color:var(--head)}
+.seg a:hover{color:#fff}
+.seg a[aria-current=page]:hover{color:var(--head)}
+
+/* 深夜帯の表 */
+.lgrid{display:grid;position:relative;min-width:max-content;--lcolw:128px;--lrowh:50px}
+body.d-compact .lgrid{--lcolw:104px;--lrowh:44px}
+body.d-fit .lgrid{--lrowh:40px}
+.lgrid .ly{grid-column:1;background:var(--head);color:#f4f1ea;font-family:var(--num);font-weight:700;font-size:22px;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.02em;border-bottom:2px solid var(--paper);position:sticky;left:0;z-index:4}
+.lgrid .lq{grid-column:2;background:var(--head2);color:#e8e6df;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #3a3c43;position:sticky;left:var(--dayw);z-index:4}
+.lgrid .lc{border-bottom:1px solid var(--rule2);border-left:1px solid var(--rule2);padding:2px;min-height:var(--lrowh)}
+.lgrid .lhead{grid-row:1;position:sticky;top:0;z-index:3;background:var(--paper);border-bottom:2px solid var(--ink)}
+.lgrid .lab{display:flex;align-items:flex-end;justify-content:center;text-align:center;font-size:11px;font-weight:700;line-height:1.3;color:var(--ink2);padding:4px 4px 3px}
+.lgrid .lab i{display:block;width:100%;height:3px;border-radius:2px;margin-top:3px}
+.lgrid .mark{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.1em}
+.lgrid .mark.gap{background:repeating-linear-gradient(135deg,transparent 0 6px,#ece7dd 6px 7px)}
+.lgrid .prog{min-height:calc(var(--lrowh) - 5px);text-align:center;align-items:center;padding:3px 6px 3px 9px;font-size:12px;line-height:1.3}
+.lgrid .prog small{display:block;font-size:10.5px;opacity:.85}
+body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
+.st-MX{background:var(--c-mx)}.st-MX::before{background:var(--a-mx)}
+.st-テレビ神奈川{background:var(--c-tk)} .st-テレビ神奈川::before{background:var(--a-tk)}
+.lnote{font-size:12.5px;color:var(--ink2);margin:8px 2px 0}

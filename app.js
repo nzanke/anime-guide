@@ -41,7 +41,7 @@
 
   function buildNav() {
     const kinds = [...new Set(D.tables.map(t => t.kind))];
-    $('#kind').innerHTML = kinds.map(k => `<button role="tab" aria-selected="${k === cur.kind}" data-k="${esc(k)}">${esc(k)}</button>`).join('');
+    $('#kind').innerHTML = kinds.map(k => `<button role="tab" aria-selected="${k === cur.kind}" data-k="${esc(k)}">${esc(k)}</button>`).join('') + '<a href="late.html">深夜</a>';
     const ts = D.tables.filter(t => t.kind === cur.kind);
     $('#decade').innerHTML = ts.map(t => `<button role="tab" aria-selected="${t === cur}" data-t="${t.id}">${esc(t.label)}</button>`).join('');
     // 年代のタブが画面からはみ出すとき（スマホ）は、選んでいるタブが見える位置まで横に送る
