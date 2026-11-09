@@ -2,7 +2,7 @@
   'use strict';
   const $ = (s, el = document) => el.querySelector(s);
   const ACCENT = {'テレビ朝日':'--a-ex','日本テレビ':'--a-nt','TBS':'--a-tb','フジテレビ':'--a-cx','テレビ東京':'--a-tx','NHK':'--a-nh'};
-  const KIND_NOTE = {'ゴールデン':'19:00・19:30 の枠', '朝・夕方':'19時より前（朝・昼・夕方）の枠'};
+  const KIND_NOTE = {'ゴールデン':'19:00・19:30 の枠', '朝・昼':'朝〜昼（15時より前）の枠', '夕方':'夕方（15時〜19時前）の枠'};
   let D, cur, hidden = new Set();
   let density = 'compact';
   try { density = localStorage.getItem('density') || 'compact'; } catch (e) {}
