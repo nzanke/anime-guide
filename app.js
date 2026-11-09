@@ -157,6 +157,7 @@
     }
     g.innerHTML = H.join('');
     fit();
+    fitOne();
     $('#gridWrap').scrollTo(0, 0);
     // 入らなかった番組
     $('#outCount').textContent = `（${cur.out.length}本）`;
@@ -166,6 +167,22 @@
     }).join('');
     applyFilter();
   }
+  // スマホの1マスだけの番組名：省略（…）が出なければ8px、出るなら6px、それでも出るなら4px
+  function fitOne() {
+    if (!narrow.matches) return;
+    // 使える高さは行の高さ（--rowh）から決める（マスの高さは中身で変わるため）
+    const rowh = parseFloat(getComputedStyle(document.body).getPropertyValue('--rowh')) || 30;
+    document.querySelectorAll('.slot.one .prog').forEach(b => {
+      const sp = b.querySelector('span');
+      for (const fs of [8, 6, 4]) {
+        b.style.fontSize = fs + 'px';
+        const lines = Math.max(1, Math.floor((rowh - 6) / (fs * 1.2)));
+        sp.style.webkitLineClamp = lines;
+        if (sp.scrollHeight <= sp.clientHeight + 1) break;
+      }
+    });
+  }
+  if (document.fonts) document.fonts.addEventListener('loadingdone', () => cur && fitOne());
   function progBtn(id) {
     const p = D.programs[id];
     return `<button class="prog st-${esc(p.st)}" data-p="${id}" title="${esc(p.t)}（${esc(p.st)}）"><span>${esc(p.t)}</span><small>${esc(p.st)}</small></button>`;
