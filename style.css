@@ -437,6 +437,7 @@ body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
   body.d-fit{--rowh:24px}
   .h-year{font-size:11px;height:18px;line-height:18px}
   .h-half{top:18px;font-size:8px;line-height:12px}
+  .corner2{top:18px}
   .day{font-size:10px}
   .day.obi{font-size:8px;letter-spacing:.05em}
   .time,.d-compact .time,.d-fit .time{font-family:var(--ud);font-weight:700;font-size:9.5px;padding:2px 1px 0;letter-spacing:0;white-space:nowrap;overflow:hidden}
