@@ -44,6 +44,9 @@
     $('#kind').innerHTML = kinds.map(k => `<button role="tab" aria-selected="${k === cur.kind}" data-k="${esc(k)}">${esc(k)}</button>`).join('');
     const ts = D.tables.filter(t => t.kind === cur.kind);
     $('#decade').innerHTML = ts.map(t => `<button role="tab" aria-selected="${t === cur}" data-t="${t.id}">${esc(t.label)}</button>`).join('');
+    // 年代のタブが画面からはみ出すとき（スマホ）は、選んでいるタブが見える位置まで横に送る
+    const sel = $('#decade [aria-selected="true"]'), bar = $('#decade');
+    if (sel && bar.scrollWidth > bar.clientWidth) bar.scrollLeft = Math.max(0, sel.offsetLeft - bar.offsetLeft - 40);
   }
   $('#density').addEventListener('click', e => {
     const b = e.target.closest('button'); if (b) setDensity(b.dataset.d);

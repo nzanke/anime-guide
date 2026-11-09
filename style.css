@@ -145,7 +145,8 @@ body.d-fit{--rowh:34px}
   .brand h1{font-size:17px}
   .search{min-width:0;flex:1 1 100%;padding:4px 12px;margin-left:0;order:3}
   .search input{font-size:16px}
-  .controls{gap:6px 10px;order:2}
+  .controls{gap:6px 10px;order:2;min-width:0;max-width:100%}
+  .tabs{max-width:100%}
   .seg button{padding:4px 12px;font-size:13px}
   .tabs button{padding:4px 8px;font-size:13px}
   main{padding:10px 12px 40px}
