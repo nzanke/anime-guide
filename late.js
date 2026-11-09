@@ -6,9 +6,7 @@
   const SEASON = ['冬', '春', '夏', '秋'];
   const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const fmt = s => { if (!s) return '放送中'; const [y,m,d] = s.split('-').map(Number); return `${y}年${m}月${d}日`; };
-  let D, cur, density = 'compact', day = '月';
-  try { day = localStorage.getItem('lday') || '月'; } catch (e) {}
-  const DAYS = ['すべて', '月', '火', '水', '木', '金', '土', '日'];
+  let D, cur, density = 'compact';
   try { density = localStorage.getItem('ldensity') || 'compact'; } catch (e) {}
   const setDensity = d => {
     density = d;
@@ -36,10 +34,6 @@
     cur = D.charts.find(c => c.group === b.dataset.g && c.y0 === cur.y0) || D.charts.find(c => c.group === b.dataset.g); render();
   });
   $('#period').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cur = D.charts.find(c => c.id === b.dataset.c); render(); });
-  $('#days').addEventListener('click', e => {
-    const b = e.target.closest('button'); if (!b) return;
-    day = b.dataset.day; try { localStorage.setItem('lday', day); } catch (e) {} render();
-  });
   // 番組名の改行位置：漢字・ひらがな・カタカナ・英数字の切れ目にだけ改行の候補（<wbr>）を入れる。
   // 英数字→カタカナ（「Vガンダム」など）は切らない。記号（！・）など）は前の字に付け、その後ろで切れるようにする。入りきらないときだけ語の途中で折る（CSS の overflow-wrap）
   const kind = ch => /[\u4E00-\u9FFF\u3400-\u4DBF々〆〇ヵヶ]/.test(ch) ? 'k' : /[\u3041-\u309F]/.test(ch) ? 'h' : /[\u30A1-\u30FA\u30FC\u30FD\u30FE\uFF66-\uFF9F]/.test(ch) ? 'c' : /[A-Za-z0-9\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A'.&∀]/.test(ch) ? 'a' : /\s/.test(ch) ? 's' : 'p';
@@ -56,14 +50,10 @@
   function render() {
     history.replaceState(null, '', '#' + cur.id);
     nav();
-    const cnt = d => cur.cols.filter(c => d === 'すべて' || c.day === d).reduce((n, c) => n + c.cells.filter(x => x.k === 'p').length, 0);
-    // 選んだ曜日にこの表の番組がなければ、番組のある最初の曜日を出す（選んだ曜日は覚えたまま）
-    let show = day;
-    if (show !== 'すべて' && !cnt(show)) show = DAYS.slice(1).find(d => cnt(d)) || 'すべて';
-    $('#days').innerHTML = DAYS.map(d => `<button data-day="${d}" role="radio" aria-checked="${d === show}"${d !== 'すべて' && !cnt(d) ? ' class="none"' : ''}>${d}<small>${cnt(d)}</small></button>`).join('');
+    // 曜日で分けず、1つの表に曜日の順（月〜日）で列を並べる（列は late.json で曜日順に並んでいる）
     $('#summary').innerHTML = `<h2>${esc(cur.gname)}の深夜アニメ放送枠</h2><span class="range">${cur.y0} – ${cur.y1}</span><span class="count">21時〜翌5時・番組 ${cur.count} 本</span>`;
     const g = $('#grid'), nq = (cur.y1 - cur.y0 + 1) * 4;
-    const cols = cur.cols.filter(c => show === 'すべて' || c.day === show), ncol = cols.length, R0 = 3;
+    const cols = cur.cols, ncol = cols.length, R0 = 3;
     g.style.gridTemplateColumns = `var(--dayw) var(--lqw) repeat(${Math.max(ncol, 1)}, var(--lcolw))`;
     g.style.gridTemplateRows = `auto auto repeat(${nq}, minmax(var(--lrowh), auto))`;
     const H = [`<div class="lc lday" style="grid-row:1;grid-column:1/3"></div><div class="lc lhead" style="grid-row:2;grid-column:1/3"></div>`];
@@ -71,11 +61,11 @@
       H.push(`<div class="ly" style="grid-row:${R0 + y * 4}/span 4">${cur.y0 + y}</div>`);
       SEASON.forEach((s, i) => H.push(`<div class="lq" style="grid-row:${R0 + y * 4 + i}">${s}</div>`));
     }
-    if (!ncol) H.push(`<div class="mark" style="grid-row:${R0}/span ${nq};grid-column:3;padding:20px 30px">この期間・曜日の番組はありません</div>`);
+    if (!ncol) H.push(`<div class="mark" style="grid-row:${R0}/span ${nq};grid-column:3;padding:20px 30px">この期間の番組はありません</div>`);
     // 曜日の帯
     for (let i = 0; i < ncol;) {
       let j = i; while (j < ncol && cols[j].day === cols[i].day) j++;
-      H.push(`<div class="lday" style="grid-row:1;grid-column:${3 + i}/span ${j - i}">${cols[i].day}曜の深夜</div>`);
+      H.push(`<div class="lday" style="grid-row:1;grid-column:${3 + i}/span ${j - i}">${cols[i].day}曜深夜</div>`);
       i = j;
     }
     cols.forEach(({cells}, ci) => {
