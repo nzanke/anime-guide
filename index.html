@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>アニメ放送枠タイムテーブル</title>
+<meta name="description" content="1960〜1990年代のテレビアニメを、曜日・時間帯・局ごとの半年単位の番組表で見る。データは日本語版ウィキペディアの放送枠記事と作品記事から。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brand">
+      <span class="brand-kicker">ANIME ON AIR</span>
+      <h1>アニメ放送枠タイムテーブル</h1>
+    </div>
+    <label class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input id="q" type="search" placeholder="番組名でさがす" autocomplete="off">
+    </label>
+  </div>
+  <nav class="controls" aria-label="表の切り替え">
+    <div class="seg" id="kind" role="tablist"></div>
+    <div class="tabs" id="decade" role="tablist"></div>
+  </nav>
+</header>
+
+<main>
+  <section class="summary" id="summary"></section>
+  <div class="legend" id="legend" aria-label="局で絞り込む"></div>
+  <div class="grid-wrap" id="gridWrap">
+    <div class="grid" id="grid"></div>
+  </div>
+  <details class="outlist" id="outlist">
+    <summary>表に入らなかった番組 <span id="outCount"></span></summary>
+    <p class="hint">同じ半期・同じ枠に、より長く放送された番組があったものです。</p>
+    <ul id="outItems"></ul>
+  </details>
+  <section class="about">
+    <h2>この番組表について</h2>
+    <ul>
+      <li>1年を「春＝4〜9月」「秋＝10〜翌3月」の2列に分け、その半期に3か月以上放送された番組を入れています（3か月以上の番組がない半期は、1か月以上放送された番組から1本）。</li>
+      <li>局は系列でまとめています（読売テレビ→日本テレビ、朝日放送・名古屋テレビ→テレビ朝日、毎日放送→TBS、関西テレビ→フジテレビ、テレビ大阪ほか→テレビ東京）。60年代のNET・東京12チャンネルも今の系列名にそろえています。</li>
+      <li>「（再）」は再放送、「帯」は月〜金（月〜土）に毎日放送された番組です。番組を押すと、放送期間・実際の時刻・出典を見られます。</li>
+      <li>データは日本語版ウィキペディアの放送枠記事と作品記事から書き写したもので、記事にない枠は入っていないことがあります。</li>
+    </ul>
+    <p class="credit">出典：<a href="https://ja.wikipedia.org/" rel="noopener">ウィキペディア日本語版</a>（CC BY-SA 4.0）／ データ更新：<span id="gen"></span></p>
+  </section>
+</main>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <article class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <button class="sheet-close" data-close aria-label="閉じる">×</button>
+    <div class="sheet-station" id="sheetStation"></div>
+    <h3 id="sheetTitle"></h3>
+    <dl id="sheetBody"></dl>
+  </article>
+</div>
+
+<div class="results" id="results" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>
