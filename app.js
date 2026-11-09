@@ -29,7 +29,7 @@
   const fmt = s => { if (!s) return '放送中'; const [y,m,d] = s.split('-').map(Number); return `${y}年${m}月${d}日`; };
   const tableOf = id => D.tables.find(t => t.id === id);
 
-  fetch('data.json', {cache: 'no-cache'}).then(r => r.json()).then(json => {
+  fetch('data.json?v=' + (document.querySelector('script[src^="app.js"]').src.split('v=')[1] || ''), {cache: 'no-cache'}).then(r => r.json()).then(json => {
     D = json;
     $('#gen').textContent = D.generated;
     const id = location.hash.slice(1);
