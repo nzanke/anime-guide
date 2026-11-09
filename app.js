@@ -135,7 +135,7 @@
           rows[q].cells.forEach(c => {
             const a = Math.max(at, cs), b = Math.min(at + c.n, ce);
             if (a < b) {
-              const cls = ['slot']; if (a % 2 === 0) cls.push('y'); if (q === m - 1) cls.push('last');
+              const cls = ['slot']; if (a % 2 === 0) cls.push('y'); if (q === m - 1) cls.push('last'); if (b - a === 1) cls.push('one');   // 1マスだけの番組（スマホでは字を半分に）
               const inner = c.p ? progBtn(c.p) : '<span class="empty" aria-hidden="true"></span>';
               H.push(`<div class="${cls.join(' ')}" style="grid-row:${r0 + q};grid-column:${3 + a - cs}/span ${b - a}">${inner}</div>`);
             }
