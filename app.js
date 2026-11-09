@@ -188,14 +188,14 @@
   }
   if (document.fonts) document.fonts.addEventListener('loadingdone', () => cur && fitOne());
   // 番組名の改行位置：漢字・ひらがな・カタカナ・英数字の切れ目にだけ改行の候補（<wbr>）を入れる。
-  // 記号（！・）など）は前の字に付け、その後ろで切れるようにする。入りきらないときだけ語の途中で折る（CSS の overflow-wrap）
+  // 英数字→カタカナ（「Vガンダム」など）は切らない。記号（！・）など）は前の字に付け、その後ろで切れるようにする。入りきらないときだけ語の途中で折る（CSS の overflow-wrap）
   const kind = ch => /[\u4E00-\u9FFF\u3400-\u4DBF々〆〇ヵヶ]/.test(ch) ? 'k' : /[\u3041-\u309F]/.test(ch) ? 'h' : /[\u30A1-\u30FA\u30FC\u30FD\u30FE\uFF66-\uFF9F]/.test(ch) ? 'c' : /[A-Za-z0-9\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A'.&]/.test(ch) ? 'a' : /\s/.test(ch) ? 's' : 'p';
   const wb = t => {
     const ch = [...String(t)]; let out = '', prev = null;
     ch.forEach((c, i) => {
       const k = kind(c);
       const open = /[（(「『〈《【［\[]/.test(c);
-      if (prev && ((k !== prev && k !== 'p' && prev !== 's') || (prev === 'p' && !/[（(「『〈《【［\[]/.test(ch[i - 1]) && k !== 'p') || open) && i > 0) out += '<wbr>';
+      if (prev && ((k !== prev && k !== 'p' && prev !== 's' && !(prev === 'a' && k === 'c')) || (prev === 'p' && !/[（(「『〈《【［\[]/.test(ch[i - 1]) && k !== 'p') || open) && i > 0) out += '<wbr>';
       out += esc(c); prev = k;
     });
     return out;
