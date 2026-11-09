@@ -4,7 +4,7 @@
   --colw:92px; --dayw:44px; --timew:62px; --rowh:54px;
   --font:"Noto Sans JP","Noto Sans CJK JP","Hiragino Sans","Yu Gothic",sans-serif;
   --num:"Barlow Condensed","Noto Sans JP",sans-serif;
-  --ud:"BIZ UDPGothic","Noto Sans JP",sans-serif;   /* 時刻の字（UDフォント） */
+  --ud:"BIZ UDGothic","Noto Sans JP",sans-serif;   /* 時刻の字（UDフォント。数字が半角の等幅） */
   /* 局の色：塗り / 帯 */
   --c-ex:#fbd3d0; --a-ex:#d9473f;   /* テレビ朝日 */
   --c-nt:#fde0bd; --a-nt:#e47f12;   /* 日本テレビ */
@@ -424,14 +424,14 @@ body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
   .results{top:88.5px;right:12px}
 }
 @media (max-width:720px){
-  :root{--dayw:18px;--timew:36px;--lqw:15px}
+  :root{--dayw:18px;--timew:28px;--lqw:15px}
   body.d-std,body.d-compact{--colw:40px;--rowh:27px}
   body.d-fit{--rowh:24px}
   .h-year{font-size:11px;height:18px;line-height:18px}
   .h-half{top:18px;font-size:8px;line-height:12px}
   .day{font-size:10px}
   .day.obi{font-size:8px;letter-spacing:.05em}
-  .time{font-family:var(--ud);font-weight:700;font-size:8.5px;padding:2px 1px 0;letter-spacing:-.03em;font-feature-settings:"hwid" 1;white-space:nowrap;overflow:hidden}
+  .time,.d-compact .time,.d-fit .time{font-family:var(--ud);font-weight:700;font-size:9.5px;padding:2px 1px 0;letter-spacing:0;white-space:nowrap;overflow:hidden}
   .slot,.d-compact .slot,.d-fit .slot{padding:1px}
   .prog,.d-compact .prog,.d-fit .prog{font-size:8px;line-height:1.15;padding:1px 2px 1px 4px;border-radius:3px;min-height:calc(var(--rowh) - 3px);font-feature-settings:"palt"}
   .prog::before,.d-compact .prog::before,.d-fit .prog::before{width:2px}
@@ -446,5 +446,5 @@ body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
   .lgrid .lc{padding:1px}
   .lgrid .mark{font-size:8px;letter-spacing:.02em}
   .lgrid .prog,body.d-compact .lgrid .prog{font-size:8px;line-height:1.15;padding:1px 2px 1px 4px;min-height:calc(var(--lrowh) - 3px);font-feature-settings:"palt"}
-  .lgrid .prog small{font-family:var(--ud);font-size:8px;letter-spacing:-.04em;font-feature-settings:"hwid" 1;opacity:.75}
+  .lgrid .prog small{font-family:var(--ud);font-size:8px;letter-spacing:0;opacity:.75}
 }
