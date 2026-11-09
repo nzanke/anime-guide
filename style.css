@@ -201,6 +201,11 @@ body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
 .dayseg button small{font-size:10px;opacity:.7;font-family:var(--num)}
 .dayseg button.none{opacity:.4}
 
+/* スマホの前半・後半の切り替え */
+.halfseg button{display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.halfseg button small{font-size:10px;opacity:.7;font-family:var(--num)}
+.halfseg[hidden]{display:none}
+
 /* ==== PC の大きさ（tools/pc_sizes.py が作る。手で直さない） ==== */
 @media (min-width:900px){
   :root{--lqw:22.5px;--colw:69px;--dayw:33px;--timew:46.5px;--rowh:40.5px}
@@ -297,6 +302,7 @@ body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
   .lgrid .lday{height:22.5px;font-size:9.5px;border-left:2px solid var(--paper)}
   .dayseg button{min-width:28.5px;padding:3px 6px}
   .dayseg button small{font-size:8px}
+  .halfseg button small{font-size:8px}
 }
 /* スマホ・タブレット：PCの大きさとスマホ向けの大きさをそれぞれ0.75倍 */
 @media (max-width:899px){
@@ -394,6 +400,7 @@ body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
   .lgrid .lday{height:22.5px;font-size:9.5px;border-left:2px solid var(--paper)}
   .dayseg button{min-width:28.5px;padding:3px 6px}
   .dayseg button small{font-size:8px}
+  .halfseg button small{font-size:8px}
 }
 @media (max-width:720px){
   :root{--colw:57px;--dayw:25.5px;--timew:37.5px;--rowh:37.5px}
@@ -425,7 +432,8 @@ body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
 }
 @media (max-width:720px){
   :root{--dayw:18px;--timew:28px;--lqw:15px}
-  body.d-std,body.d-compact{--colw:40px;--rowh:27px}
+  body.d-std{--colw:44px;--rowh:27px}
+  body.d-compact{--colw:calc((100vw - 76px) / 10);--rowh:30px}   /* 前半・後半の5年（10列）がちょうど画面に入る幅 */
   body.d-fit{--rowh:24px}
   .h-year{font-size:11px;height:18px;line-height:18px}
   .h-half{top:18px;font-size:8px;line-height:12px}

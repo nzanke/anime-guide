@@ -5,6 +5,16 @@
   const KIND_NOTE = {'ゴールデン':'19:00・19:30 の枠', '朝・昼':'朝〜昼（15時より前）の枠', '夕方':'夕方（15時〜19時前）の枠'};
   let D, cur, hidden = new Set();
   let density = 'compact';
+  // スマホでは10年の表を前半（1〜5年目）・後半（6〜10年目）に分けて出す
+  const narrow = window.matchMedia('(max-width:720px)');
+  let half = 1;
+  try { half = Number(localStorage.getItem('half')) || 1; } catch (e) {}
+  narrow.addEventListener('change', () => cur && render());
+  const view = () => {
+    const n = cur.y1 - cur.y0 + 1;
+    if (!narrow.matches || n <= 5) return {a: cur.y0, b: cur.y1, split: false};
+    return half === 2 ? {a: cur.y0 + 5, b: cur.y1, split: true} : {a: cur.y0, b: cur.y0 + 4, split: true};
+  };
   try { density = localStorage.getItem('density') || 'compact'; } catch (e) {}
   const setDensity = d => {
     density = d;
@@ -19,7 +29,7 @@
     if (density !== 'fit') { g.style.removeProperty('--colw'); return; }
     const cs = getComputedStyle(document.body);
     const fixed = parseFloat(cs.getPropertyValue('--dayw')) + parseFloat(cs.getPropertyValue('--timew'));
-    const ncol = (cur.y1 - cur.y0 + 1) * 2;
+    const v = view(), ncol = (v.b - v.a + 1) * 2;
     const w = Math.max(30, Math.floor(($('#gridWrap').clientWidth - fixed - 2) / ncol));
     g.style.setProperty('--colw', w + 'px');
   }
@@ -48,6 +58,10 @@
     const sel = $('#decade [aria-selected="true"]'), bar = $('#decade');
     if (sel && bar.scrollWidth > bar.clientWidth) bar.scrollLeft = Math.max(0, sel.offsetLeft - bar.offsetLeft - 40);
   }
+  $('#half').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    half = Number(b.dataset.h); try { localStorage.setItem('half', half); } catch (e) {} render();
+  });
   $('#density').addEventListener('click', e => {
     const b = e.target.closest('button'); if (b) setDensity(b.dataset.d);
   });
@@ -86,20 +100,29 @@
   function render() {
     history.replaceState(null, '', '#' + cur.id);
     buildNav();
-    const years = cur.y1 - cur.y0 + 1, ncol = years * 2;
+    const v = view(), years = v.b - v.a + 1, ncol = years * 2;
+    const cs = (v.a - cur.y0) * 2, ce = cs + ncol;   // 見せる列（表全体の何列目から何列目まで）
+    $('#half').hidden = !v.split;
+    if (v.split) {
+      const dec = String(cur.y0).slice(2);
+      $('#half').innerHTML = [1, 2].map(h => `<button role="radio" data-h="${h}" aria-checked="${h === half}">${dec}年代${h === 1 ? '前半' : '後半'}<small>${h === 1 ? cur.y0 : cur.y0 + 5}–${h === 1 ? String(cur.y0 + 4).slice(2) : String(cur.y1).slice(2)}</small></button>`).join('');
+    }
     const placed = cur.rows.reduce((n, r) => n + r.cells.filter(c => c.p).length, 0);
     const uniq = new Set(cur.rows.flatMap(r => r.cells.filter(c => c.p).map(c => c.p))).size;
-    $('#summary').innerHTML = `<h2>${esc(cur.kind)}　${esc(cur.label)}</h2><span class="range">${cur.y0}.4 – ${cur.y1 + 1}.3</span><span class="count">${esc(KIND_NOTE[cur.kind] || '')}・表に入った番組 ${uniq} 本</span>`;
+    $('#summary').innerHTML = `<h2>${esc(cur.kind)}　${esc(cur.label)}</h2><span class="range">${v.a}.4 – ${v.b + 1}.3</span><span class="count">${esc(KIND_NOTE[cur.kind] || '')}・表に入った番組 ${uniq} 本</span>`;
     const g = $('#grid');
     g.style.gridTemplateColumns = `var(--dayw) var(--timew) repeat(${ncol}, var(--colw))`;
     const H = [];
     H.push(`<div class="corner" style="grid-row:1;grid-column:1/3"></div><div class="corner2" style="grid-row:2;grid-column:1/3"></div>`);
     for (let y = 0; y < years; y++) {
-      H.push(`<div class="h h-year" style="grid-row:1;grid-column:${3 + y * 2}/span 2">${cur.y0 + y}</div>`);
+      H.push(`<div class="h h-year" style="grid-row:1;grid-column:${3 + y * 2}/span 2">${v.a + y}</div>`);
       H.push(`<div class="h-half y" style="grid-row:2;grid-column:${3 + y * 2}">春</div><div class="h-half" style="grid-row:2;grid-column:${4 + y * 2}">秋</div>`);
     }
     // 曜日・時間帯のまとまり
-    const rows = cur.rows; let r0 = 3;
+    // 見せている期間に番組が1本もない行は出さない（スマホの前半・後半など）
+    const has = r => { let at = 0; return r.cells.some(c => { const hit = c.p && Math.max(at, cs) < Math.min(at + c.n, ce); at += c.n; return hit; }); };
+    const rows = cur.rows.filter(has).map((r, i, a) => ({...r, first: i === 0 || a[i - 1].day !== r.day || a[i - 1].time !== r.time}));
+    let r0 = 3;
     for (let i = 0; i < rows.length;) {
       let j = i; while (j < rows.length && rows[j].day === rows[i].day) j++;
       const day = rows[i].day;
@@ -108,12 +131,15 @@
         let m = k + 1; while (m < j && !rows[m].first) m++;
         H.push(`<div class="time" style="grid-row:${r0 + k}/${r0 + m};grid-column:2">${esc(rows[k].time)}</div>`);
         for (let q = k; q < m; q++) {
-          let col = 3;
+          let at = 0;   // 表全体での列の位置。見せる範囲にかかる部分だけを切り出して置く
           rows[q].cells.forEach(c => {
-            const cls = ['slot']; if ((col - 3) % 2 === 0) cls.push('y'); if (q === m - 1) cls.push('last');
-            const inner = c.p ? progBtn(c.p) : '<span class="empty" aria-hidden="true"></span>';
-            H.push(`<div class="${cls.join(' ')}" style="grid-row:${r0 + q};grid-column:${col}/span ${c.n}">${inner}</div>`);
-            col += c.n;
+            const a = Math.max(at, cs), b = Math.min(at + c.n, ce);
+            if (a < b) {
+              const cls = ['slot']; if (a % 2 === 0) cls.push('y'); if (q === m - 1) cls.push('last');
+              const inner = c.p ? progBtn(c.p) : '<span class="empty" aria-hidden="true"></span>';
+              H.push(`<div class="${cls.join(' ')}" style="grid-row:${r0 + q};grid-column:${3 + a - cs}/span ${b - a}">${inner}</div>`);
+            }
+            at += c.n;
           });
         }
         k = m;
