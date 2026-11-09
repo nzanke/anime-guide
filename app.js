@@ -5,6 +5,11 @@
   const KIND_NOTE = {'ゴールデン':'19:00・19:30 の枠', '朝・昼':'朝〜昼（15時より前）の枠', '夕方':'夕方（15時〜19時前）の枠'};
   let D, cur, hidden = new Set();
   let density = 'compact';
+  // 再放送（番組名に「（再）」）の表示。標準はオフ
+  let showRe = false;
+  try { showRe = localStorage.getItem('rerun') === '1'; } catch (e) {}
+  const isRe = id => D.programs[id].t.includes('（再）');
+  const visible = id => showRe || !isRe(id);
   // スマホでは10年の表を前半（1〜5年目）・後半（6〜10年目）に分けて出す
   const narrow = window.matchMedia('(max-width:720px)');
   let half = 1;
@@ -45,6 +50,7 @@
     const id = location.hash.slice(1);
     cur = tableOf(id) || D.tables[0];
     buildLegend();
+    setRe(showRe);
     render();
     setDensity(density);
   });
@@ -58,6 +64,9 @@
     const sel = $('#decade [aria-selected="true"]'), bar = $('#decade');
     if (sel && bar.scrollWidth > bar.clientWidth) bar.scrollLeft = Math.max(0, sel.offsetLeft - bar.offsetLeft - 40);
   }
+  const reBtn = $('#rerun');
+  const setRe = v => { showRe = v; reBtn.setAttribute('aria-pressed', v); reBtn.querySelector('b').textContent = v ? 'オン' : 'オフ'; try { localStorage.setItem('rerun', v ? '1' : '0'); } catch (e) {} };
+  reBtn.addEventListener('click', () => { setRe(!showRe); render(); });
   $('#half').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     half = Number(b.dataset.h); try { localStorage.setItem('half', half); } catch (e) {} render();
@@ -120,7 +129,7 @@
     }
     // 曜日・時間帯のまとまり
     // 見せている期間に番組が1本もない行は出さない（スマホの前半・後半など）
-    const has = r => { let at = 0; return r.cells.some(c => { const hit = c.p && Math.max(at, cs) < Math.min(at + c.n, ce); at += c.n; return hit; }); };
+    const has = r => { let at = 0; return r.cells.some(c => { const hit = c.p && visible(c.p) && Math.max(at, cs) < Math.min(at + c.n, ce); at += c.n; return hit; }); };
     const rows = cur.rows.filter(has).map((r, i, a) => ({...r, first: i === 0 || a[i - 1].day !== r.day || a[i - 1].time !== r.time}));
     let r0 = 3;
     for (let i = 0; i < rows.length;) {
@@ -136,7 +145,7 @@
             const a = Math.max(at, cs), b = Math.min(at + c.n, ce);
             if (a < b) {
               const cls = ['slot']; if (a % 2 === 0) cls.push('y'); if (q === m - 1) cls.push('last'); if (b - a === 1) cls.push('one');   // 1マスだけの番組（スマホでは字を半分に）
-              const inner = c.p ? progBtn(c.p) : '<span class="empty" aria-hidden="true"></span>';
+              const inner = c.p && visible(c.p) ? progBtn(c.p) : '<span class="empty" aria-hidden="true"></span>';
               H.push(`<div class="${cls.join(' ')}" style="grid-row:${r0 + q};grid-column:${3 + a - cs}/span ${b - a}">${inner}</div>`);
             }
             at += c.n;
@@ -210,6 +219,7 @@
     const b = e.target.closest('button'); if (!b) return;
     hideResults();
     const t = tableOf(b.dataset.t), id = b.dataset.id;
+    if (!visible(id)) { setRe(true); if (t === cur) render(); }
     if (t !== cur) { cur = t; render(); }
     hidden.clear(); [...$('#legend').children].forEach(x => x.setAttribute('aria-pressed', 'true')); applyFilter();
     const el = document.querySelector(`.prog[data-p="${id}"]`);
