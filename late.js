@@ -6,7 +6,9 @@
   const SEASON = ['冬', '春', '夏', '秋'];
   const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const fmt = s => { if (!s) return '放送中'; const [y,m,d] = s.split('-').map(Number); return `${y}年${m}月${d}日`; };
-  let D, cur, density = 'compact';
+  let D, cur, density = 'compact', day = '月';
+  try { day = localStorage.getItem('lday') || '月'; } catch (e) {}
+  const DAYS = ['すべて', '月', '火', '水', '木', '金', '土', '日'];
   try { density = localStorage.getItem('ldensity') || 'compact'; } catch (e) {}
   const setDensity = d => {
     density = d;
@@ -34,24 +36,40 @@
     cur = D.charts.find(c => c.group === b.dataset.g && c.y0 === cur.y0) || D.charts.find(c => c.group === b.dataset.g); render();
   });
   $('#period').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cur = D.charts.find(c => c.id === b.dataset.c); render(); });
+  $('#days').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    day = b.dataset.day; try { localStorage.setItem('lday', day); } catch (e) {} render();
+  });
   function render() {
     history.replaceState(null, '', '#' + cur.id);
     nav();
+    const cnt = d => cur.cols.filter(c => d === 'すべて' || c.day === d).reduce((n, c) => n + c.cells.filter(x => x.k === 'p').length, 0);
+    // 選んだ曜日にこの表の番組がなければ、番組のある最初の曜日を出す（選んだ曜日は覚えたまま）
+    let show = day;
+    if (show !== 'すべて' && !cnt(show)) show = DAYS.slice(1).find(d => cnt(d)) || 'すべて';
+    $('#days').innerHTML = DAYS.map(d => `<button data-day="${d}" role="radio" aria-checked="${d === show}"${d !== 'すべて' && !cnt(d) ? ' class="none"' : ''}>${d}<small>${cnt(d)}</small></button>`).join('');
     $('#summary').innerHTML = `<h2>${esc(cur.gname)}の深夜アニメ放送枠</h2><span class="range">${cur.y0} – ${cur.y1}</span><span class="count">21時〜翌5時・番組 ${cur.count} 本</span>`;
-    const g = $('#grid'), nq = (cur.y1 - cur.y0 + 1) * 4, ncol = cur.cols.length;
-    g.style.gridTemplateColumns = `var(--dayw) 30px repeat(${ncol}, var(--lcolw))`;
-    g.style.gridTemplateRows = `auto repeat(${nq}, minmax(var(--lrowh), auto))`;
-    const H = [`<div class="lc lhead" style="grid-column:1/3"></div>`];
+    const g = $('#grid'), nq = (cur.y1 - cur.y0 + 1) * 4;
+    const cols = cur.cols.filter(c => show === 'すべて' || c.day === show), ncol = cols.length, R0 = 3;
+    g.style.gridTemplateColumns = `var(--dayw) var(--lqw) repeat(${Math.max(ncol, 1)}, var(--lcolw))`;
+    g.style.gridTemplateRows = `auto auto repeat(${nq}, minmax(var(--lrowh), auto))`;
+    const H = [`<div class="lc lday" style="grid-row:1;grid-column:1/3"></div><div class="lc lhead" style="grid-row:2;grid-column:1/3"></div>`];
     for (let y = 0; y <= cur.y1 - cur.y0; y++) {
-      H.push(`<div class="ly" style="grid-row:${2 + y * 4}/span 4">${cur.y0 + y}</div>`);
-      SEASON.forEach((s, i) => H.push(`<div class="lq" style="grid-row:${2 + y * 4 + i}">${s}</div>`));
+      H.push(`<div class="ly" style="grid-row:${R0 + y * 4}/span 4">${cur.y0 + y}</div>`);
+      SEASON.forEach((s, i) => H.push(`<div class="lq" style="grid-row:${R0 + y * 4 + i}">${s}</div>`));
     }
-    if (!ncol) H.push(`<div class="mark" style="grid-row:2/span ${nq};grid-column:3;padding:20px">この期間の番組はありません</div>`);
-    cur.cols.forEach((cells, ci) => {
+    if (!ncol) H.push(`<div class="mark" style="grid-row:${R0}/span ${nq};grid-column:3;padding:20px 30px">この期間・曜日の番組はありません</div>`);
+    // 曜日の帯
+    for (let i = 0; i < ncol;) {
+      let j = i; while (j < ncol && cols[j].day === cols[i].day) j++;
+      H.push(`<div class="lday" style="grid-row:1;grid-column:${3 + i}/span ${j - i}">${cols[i].day}曜の深夜</div>`);
+      i = j;
+    }
+    cols.forEach(({cells}, ci) => {
       const col = 3 + ci, used = new Set();
       let headDone = false;
       cells.forEach(c => {
-        const row = c.r < 0 ? 1 : 2 + c.r;
+        const row = c.r < 0 ? 2 : R0 + c.r;
         if (c.r < 0) headDone = true;
         for (let k = 0; k < c.n; k++) used.add(row + k);
         if (c.k === 'label') {
@@ -59,13 +77,13 @@
           H.push(`<div class="${cls}" style="grid-row:${row};grid-column:${col}"><span>${esc(c.t)}<i style="background:var(${ACCENT[c.st]})"></i></span></div>`);
         } else if (c.k === 'p') {
           const p = D.programs[c.p];
-          H.push(`<div class="lc" style="grid-row:${row}/span ${c.n};grid-column:${col}"><button class="prog st-${CLS(p.st)}" data-p="${c.p}" title="${esc(p.t)}（${esc(p.st)}）"><span>${esc(p.t)}<small>（${esc(p.d)}曜${p.slot ? esc(p.slot) : '深夜'}）</small></span></button></div>`);
+          H.push(`<div class="lc" style="grid-row:${row}/span ${c.n};grid-column:${col}"><button class="prog st-${CLS(p.st)}" data-p="${c.p}" title="${esc(p.t)}（${esc(p.st)}）"><span>${esc(p.t)}<small>（${esc(p.d)}${p.slot ? esc(p.slot) : '深夜'}）</small></span></button></div>`);
         } else {
           H.push(`<div class="lc mark${c.k === 'gap' ? ' gap' : ''}" style="grid-row:${row}/span ${c.n};grid-column:${col}">${esc(c.t)}</div>`);
         }
       });
-      if (!headDone) H.push(`<div class="lc lhead" style="grid-column:${col}"></div>`);
-      for (let r = 2; r < 2 + nq; r++) if (!used.has(r)) H.push(`<div class="lc" style="grid-row:${r};grid-column:${col}"></div>`);
+      if (!headDone) H.push(`<div class="lc lhead" style="grid-row:2;grid-column:${col}"></div>`);
+      for (let r = R0; r < R0 + nq; r++) if (!used.has(r)) H.push(`<div class="lc" style="grid-row:${r};grid-column:${col}"></div>`);
     });
     g.innerHTML = H.join('');
     $('#gridWrap').scrollTo(0, 0);

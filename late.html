@@ -7,8 +7,8 @@
 <meta name="description" content="1995〜2024年の深夜アニメを、局ごと・3か月ごとの放送枠の表で見る。データは日本語版ウィキペディアの作品記事から。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261109g">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=BIZ+UDPGothic:wght@400;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=20261110g">
 </head>
 <body>
 <header class="masthead">
@@ -30,6 +30,7 @@
 <main>
   <div class="bar">
     <section class="summary" id="summary"></section>
+    <div class="density dayseg" id="days" role="radiogroup" aria-label="曜日"></div>
     <div class="density" id="density" role="radiogroup" aria-label="表示の密度">
       <button data-d="std" aria-checked="false" role="radio">標準</button>
       <button data-d="compact" aria-checked="true" role="radio">コンパクト</button>
@@ -38,7 +39,7 @@
   <div class="grid-wrap" id="gridWrap">
     <div class="lgrid" id="grid"></div>
   </div>
-  <p class="lnote">列は放送枠（同じ局・同じ曜日で、時刻の近い番組をつないだもの）。枠の名前は記事にある枠名（『ノイタミナ』など）か「局・曜日」。時刻は翌0時〜5時を前の日の24時〜29時で書いています。</p>
+  <p class="lnote">曜日は放送日の夜（例：木曜25:25は金曜の午前1時25分）。列は放送枠（同じ局・同じ曜日で、時刻の近い番組をつないだもの）。枠の名前は記事にある枠名（『ノイタミナ』など）か「局・曜日」。時刻は翌0時〜5時を前の日の24時〜29時で書いています。</p>
   <section class="about">
     <h2>深夜の表について</h2>
     <ul>
@@ -59,6 +60,6 @@
     <dl id="sheetBody"></dl>
   </article>
 </div>
-<script src="late.js?v=20261109g"></script>
+<script src="late.js?v=20261110g"></script>
 </body>
 </html>
