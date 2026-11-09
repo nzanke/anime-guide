@@ -174,18 +174,35 @@
     const rowh = parseFloat(getComputedStyle(document.body).getPropertyValue('--rowh')) || 30;
     document.querySelectorAll('.slot.one .prog').forEach(b => {
       const sp = b.querySelector('span');
-      for (const fs of [8, 6, 4]) {
+      // まず語の途中で折らずに（切れ目だけで）収まる大きさを 8→6→4px の順に探し、
+      // どれでも収まらなければ、語の途中で折ってよいとして省略の出ない大きさを探す
+      const tryFit = (fs, strict) => {
         b.style.fontSize = fs + 'px';
-        const lines = Math.max(1, Math.floor((rowh - 6) / (fs * 1.2)));
-        sp.style.webkitLineClamp = lines;
-        if (sp.scrollHeight <= sp.clientHeight + 1) break;
-      }
+        sp.style.overflowWrap = strict ? 'normal' : '';
+        sp.style.webkitLineClamp = Math.max(1, Math.floor((rowh - 6) / (fs * 1.2)));
+        return sp.scrollHeight <= sp.clientHeight + 1 && sp.scrollWidth <= sp.clientWidth + 1;
+      };
+      if ([8, 6, 4].some(fs => tryFit(fs, true))) return;
+      if ([8, 6, 4].some(fs => tryFit(fs, false))) return;
     });
   }
   if (document.fonts) document.fonts.addEventListener('loadingdone', () => cur && fitOne());
+  // 番組名の改行位置：漢字・ひらがな・カタカナ・英数字の切れ目にだけ改行の候補（<wbr>）を入れる。
+  // 記号（！・）など）は前の字に付け、その後ろで切れるようにする。入りきらないときだけ語の途中で折る（CSS の overflow-wrap）
+  const kind = ch => /[\u4E00-\u9FFF\u3400-\u4DBF々〆〇ヵヶ]/.test(ch) ? 'k' : /[\u3041-\u309F]/.test(ch) ? 'h' : /[\u30A1-\u30FA\u30FC\u30FD\u30FE\uFF66-\uFF9F]/.test(ch) ? 'c' : /[A-Za-z0-9\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A'.&]/.test(ch) ? 'a' : /\s/.test(ch) ? 's' : 'p';
+  const wb = t => {
+    const ch = [...String(t)]; let out = '', prev = null;
+    ch.forEach((c, i) => {
+      const k = kind(c);
+      const open = /[（(「『〈《【［\[]/.test(c);
+      if (prev && ((k !== prev && k !== 'p' && prev !== 's') || (prev === 'p' && !/[（(「『〈《【［\[]/.test(ch[i - 1]) && k !== 'p') || open) && i > 0) out += '<wbr>';
+      out += esc(c); prev = k;
+    });
+    return out;
+  };
   function progBtn(id) {
     const p = D.programs[id];
-    return `<button class="prog st-${esc(p.st)}" data-p="${id}" title="${esc(p.t)}（${esc(p.st)}）"><span>${esc(p.t)}</span><small>${esc(p.st)}</small></button>`;
+    return `<button class="prog st-${esc(p.st)}" data-p="${id}" title="${esc(p.t)}（${esc(p.st)}）"><span>${wb(p.t)}</span><small>${esc(p.st)}</small></button>`;
   }
 
   // 詳細

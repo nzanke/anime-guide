@@ -40,6 +40,19 @@
     const b = e.target.closest('button'); if (!b) return;
     day = b.dataset.day; try { localStorage.setItem('lday', day); } catch (e) {} render();
   });
+  // 番組名の改行位置：漢字・ひらがな・カタカナ・英数字の切れ目にだけ改行の候補（<wbr>）を入れる。
+  // 記号（！・）など）は前の字に付け、その後ろで切れるようにする。入りきらないときだけ語の途中で折る（CSS の overflow-wrap）
+  const kind = ch => /[\u4E00-\u9FFF\u3400-\u4DBF々〆〇ヵヶ]/.test(ch) ? 'k' : /[\u3041-\u309F]/.test(ch) ? 'h' : /[\u30A1-\u30FA\u30FC\u30FD\u30FE\uFF66-\uFF9F]/.test(ch) ? 'c' : /[A-Za-z0-9\uFF10-\uFF19\uFF21-\uFF3A\uFF41-\uFF5A'.&]/.test(ch) ? 'a' : /\s/.test(ch) ? 's' : 'p';
+  const wb = t => {
+    const ch = [...String(t)]; let out = '', prev = null;
+    ch.forEach((c, i) => {
+      const k = kind(c);
+      const open = /[（(「『〈《【［\[]/.test(c);
+      if (prev && ((k !== prev && k !== 'p' && prev !== 's') || (prev === 'p' && !/[（(「『〈《【［\[]/.test(ch[i - 1]) && k !== 'p') || open) && i > 0) out += '<wbr>';
+      out += esc(c); prev = k;
+    });
+    return out;
+  };
   function render() {
     history.replaceState(null, '', '#' + cur.id);
     nav();
@@ -77,7 +90,7 @@
           H.push(`<div class="${cls}" style="grid-row:${row};grid-column:${col}"><span>${esc(c.t)}<i style="background:var(${ACCENT[c.st]})"></i></span></div>`);
         } else if (c.k === 'p') {
           const p = D.programs[c.p];
-          H.push(`<div class="lc" style="grid-row:${row}/span ${c.n};grid-column:${col}"><button class="prog st-${CLS(p.st)}" data-p="${c.p}" title="${esc(p.t)}（${esc(p.st)}）"><span>${esc(p.t)}<small>（${esc(p.d)}${p.slot ? esc(p.slot) : '深夜'}）</small></span></button></div>`);
+          H.push(`<div class="lc" style="grid-row:${row}/span ${c.n};grid-column:${col}"><button class="prog st-${CLS(p.st)}" data-p="${c.p}" title="${esc(p.t)}（${esc(p.st)}）"><span>${wb(p.t)}<small>（${esc(p.d)}${p.slot ? esc(p.slot) : '深夜'}）</small></span></button></div>`);
         } else {
           H.push(`<div class="lc mark${c.k === 'gap' ? ' gap' : ''}" style="grid-row:${row}/span ${c.n};grid-column:${col}">${esc(c.t)}</div>`);
         }
