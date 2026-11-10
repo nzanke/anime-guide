@@ -92,8 +92,8 @@
     // 番組の中で放送された短いアニメ（表には入れない）
     const inn = cur.inner || [];
     // 開閉式（ふだんは閉じておく）
-    $('#inner').innerHTML = inn.length ? `<details><summary>短編アニメ・番組内アニメ（${inn.length}本・表には入れていません）</summary><ul>` +
-      inn.map(p => `<li><b>${esc(p.t)}</b>　${esc(p.st)}（${esc(p.d)}${esc(p.slot || '深夜')}）${fmt(p.s)}〜${p.e ? fmt(p.e) : ''}　${p.host ? `『${esc(p.host)}』内` : `${esc(p.min)}分`}</li>`).join('') + '</ul></details>' : '';
+    $('#inner').innerHTML = inn.length ? `<details><summary>表に入っていない番組（${inn.length}本：短編アニメ・番組内アニメ・放送期間の短い番組）</summary><ul>` +
+      inn.map(p => `<li><b>${esc(p.t)}</b>　${esc(p.st)}（${esc(p.d)}${esc(p.slot || '深夜')}）${fmt(p.s)}〜${p.e ? fmt(p.e) : ''}　${p.why === '番組内' ? `『${esc(p.host)}』内` : p.why === '短編' ? `短編・${esc(p.min)}分` : '放送期間が短い'}</li>`).join('') + '</ul></details>' : '';
     $('#gridWrap').scrollTo(0, 0);
   }
   document.addEventListener('click', e => {
