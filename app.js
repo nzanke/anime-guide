@@ -222,7 +222,6 @@
       row('放送期間', `${fmt(p.s)} 〜 ${fmt(p.e)}`) +
       row('枠', `${esc(p.d)}曜 ${esc(p.slot)}`.replace('帯曜', '帯')) +
       row('実際の時刻', esc(p.act)) +
-      row('表への反映', p.in ? '表に入れた' : '表に入らず（同じ半期に、より長く放送された番組がある）') +
       row('備考', esc(p.note)) +
       row('出典', `<a href="${wiki}" target="_blank" rel="noopener">${esc(p.src)}</a>（ウィキペディア）`);
     $('#sheet').hidden = false;
