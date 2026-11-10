@@ -80,7 +80,7 @@
           H.push(`<div class="${cls}" style="grid-row:${row};grid-column:${col}"><span>${esc(c.t)}<i style="background:var(${ACCENT[c.st]})"></i></span></div>`);
         } else if (c.k === 'p') {
           const p = D.programs[c.p];
-          H.push(`<div class="lc" style="grid-row:${row}/span ${c.n};grid-column:${col}"><button class="prog st-${CLS(p.st)}" data-p="${c.p}" title="${esc(p.t)}（${esc(p.st)}）"><span>${wb(p.t)}<small>（${esc(p.d)}${p.slot ? esc(p.slot) : '深夜'}）</small></span></button></div>`);
+          H.push(`<div class="lc" style="grid-row:${row}/span ${c.n};grid-column:${col}"><button class="prog st-${CLS(p.st)}" data-p="${c.p}" title="${esc(p.t)}（${esc(p.st)}）"><span style="-webkit-line-clamp:${c.n > 1 ? c.n * 2 + 1 : 2}">${wb(p.t)}</span><small>（${esc(p.d)}${p.slot ? esc(p.slot) : '深夜'}）</small></button></div>`);
         } else {
           H.push(`<div class="lc mark${c.k === 'gap' ? ' gap' : ''}" style="grid-row:${row}/span ${c.n};grid-column:${col}">${esc(c.t)}</div>`);
         }
