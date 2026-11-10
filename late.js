@@ -89,6 +89,11 @@
       for (let r = R0; r < R0 + nq; r++) if (!used.has(r)) H.push(`<div class="lc" style="grid-row:${r};grid-column:${col}"></div>`);
     });
     g.innerHTML = H.join('');
+    // 番組の中で放送された短いアニメ（表には入れない）
+    const inn = cur.inner || [];
+    // 開閉式（ふだんは閉じておく）
+    $('#inner').innerHTML = inn.length ? `<details><summary>番組の中で放送された短編アニメ（${inn.length}本・表には入れていません）</summary><ul>` +
+      inn.map(p => `<li><b>${esc(p.t)}</b>　${esc(p.st)}（${esc(p.d)}${esc(p.slot || '深夜')}）${fmt(p.s)}〜${p.e ? fmt(p.e) : ''}　『${esc(p.host)}』内</li>`).join('') + '</ul></details>' : '';
     $('#gridWrap').scrollTo(0, 0);
   }
   document.addEventListener('click', e => {

@@ -211,6 +211,13 @@ body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
 .rerun b{font-family:var(--num);font-size:12px;letter-spacing:.04em;padding:1px 8px;border-radius:999px;background:#e9e5dc;color:var(--ink2)}
 .rerun[aria-pressed=true] b{background:var(--ink);color:#fff}
 
+.inner{margin-top:14px;font-size:13px;color:var(--ink2)}
+.inner summary{font-size:14px;font-weight:700;color:var(--ink);cursor:pointer;padding:4px 0}
+.inner ul{margin-top:6px!important}
+.inner ul{padding-left:1.2em;margin:0;columns:2;column-gap:28px}
+.inner li{break-inside:avoid;margin:0 0 2px}
+@media (max-width:720px){.inner ul{columns:1}}
+
 /* ==== PC の大きさ（tools/pc_sizes.py が作る。手で直さない） ==== */
 @media (min-width:900px){
   :root{--lqw:22.5px;--colw:69px;--dayw:33px;--timew:46.5px;--rowh:40.5px}
@@ -310,6 +317,11 @@ body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
   .halfseg button small{font-size:8px}
   .rerun{gap:4.5px;font-size:10px;border:1px solid var(--rule);border-radius:749px;padding:4px 9px}
   .rerun b{font-size:9px;padding:1px 6px;border-radius:749px}
+  .inner{margin-top:10.5px;font-size:10px}
+  .inner summary{font-size:10.5px;padding:3px 0}
+  .inner ul{margin-top:4.5px!important}
+  .inner ul{column-gap:21px}
+  .inner li{margin:0 0 2px}
 }
 /* スマホ・タブレット：PCの大きさとスマホ向けの大きさをそれぞれ0.75倍 */
 @media (max-width:899px){
@@ -410,6 +422,11 @@ body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
   .halfseg button small{font-size:8px}
   .rerun{gap:4.5px;font-size:10px;border:1px solid var(--rule);border-radius:749px;padding:4px 9px}
   .rerun b{font-size:9px;padding:1px 6px;border-radius:749px}
+  .inner{margin-top:10.5px;font-size:10px}
+  .inner summary{font-size:10.5px;padding:3px 0}
+  .inner ul{margin-top:4.5px!important}
+  .inner ul{column-gap:21px}
+  .inner li{margin:0 0 2px}
 }
 @media (max-width:720px){
   :root{--colw:57px;--dayw:25.5px;--timew:37.5px;--rowh:37.5px}
