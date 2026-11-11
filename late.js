@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const $ = (s, el = document) => el.querySelector(s);
-  const ACCENT = {'テレビ朝日':'--a-ex','日本テレビ':'--a-nt','TBS':'--a-tb','フジテレビ':'--a-cx','テレビ東京':'--a-tx','TOKYO MX':'--a-mx','テレビ神奈川':'--a-tk'};
+  const ACCENT = {'テレビ朝日':'--a-ex','日本テレビ':'--a-nt','TBS':'--a-tb','フジテレビ':'--a-cx','テレビ東京':'--a-tx','TOKYO MX':'--a-mx','テレビ神奈川':'--a-tk','NHK':'--a-nh'};
   const CLS = s => s === 'TOKYO MX' ? 'MX' : s;
   const SEASON = ['冬', '春', '夏', '秋'];
   const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -17,20 +17,26 @@
   };
   $('#density').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setDensity(b.dataset.d); });
   const v = (document.querySelector('script[src^="late.js"]').src.split('v=')[1] || '');
-  fetch('late.json?v=' + v, {cache: 'no-cache'}).then(r => r.json()).then(j => {
+  const SRC = document.body.dataset.src || 'late.json';   // 夕方の2020年代（evening.html）は evening.json
+  fetch(SRC + '?v=' + v, {cache: 'no-cache'}).then(r => r.json()).then(j => {
     D = j; $('#gen').textContent = D.generated;
     cur = D.charts.find(c => c.id === location.hash.slice(1)) || D.charts.find(c => c.id === 'key-2005') || D.charts[0];
+    D.title = D.title || '深夜アニメ放送枠'; D.hours = D.hours || '21時〜翌5時'; if (D.daysuf === undefined) D.daysuf = '深夜';
     setDensity(density); render();
   });
   function nav() {
-    $('#group').innerHTML = D.groups.map(([k, n]) => `<button role="tab" aria-selected="${k === cur.group}" data-g="${k}">${esc(n)}</button>`).join('');
+    // 夕方のページは局のまとまりが1つなので、代わりに年代のタブ（ほかの年代は番組表のページへ）
+    $('#group').innerHTML = D.decades ? D.decades.map(([n, u]) => u ? `<a href="${u}">${esc(n)}</a>` : `<button role="tab" aria-selected="true">${esc(n)}</button>`).join('')
+      : D.groups.map(([k, n]) => `<button role="tab" aria-selected="${k === cur.group}" data-g="${k}">${esc(n)}</button>`).join('');
     const ps = D.charts.filter(c => c.group === cur.group);
     $('#period').innerHTML = ps.map(c => `<button role="tab" aria-selected="${c === cur}" data-c="${c.id}">${c.y1 - c.y0 < 4 ? c.y0 + "年〜" : c.y0 + "〜" + String(c.y1).slice(2) + "年"}</button>`).join('');
-    const sel = $('#period [aria-selected="true"]'), bar = $('#period');
-    if (sel && bar.scrollWidth > bar.clientWidth) bar.scrollLeft = Math.max(0, sel.offsetLeft - bar.offsetLeft - 40);
+    for (const id of ['#period', '#group']) {   // 選んでいるタブが見える位置まで横に送る（スマホ）
+      const sel = $(id + ' [aria-selected="true"]'), bar = $(id);
+      if (sel && bar.scrollWidth > bar.clientWidth) bar.scrollLeft = Math.max(0, sel.offsetLeft - bar.offsetLeft - 40);
+    }
   }
   $('#group').addEventListener('click', e => {
-    const b = e.target.closest('button'); if (!b) return;
+    const b = e.target.closest('button'); if (!b || !b.dataset.g) return;
     cur = D.charts.find(c => c.group === b.dataset.g && c.y0 === cur.y0) || D.charts.find(c => c.group === b.dataset.g); render();
   });
   $('#period').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cur = D.charts.find(c => c.id === b.dataset.c); render(); });
@@ -51,7 +57,7 @@
     history.replaceState(null, '', '#' + cur.id);
     nav();
     // 曜日で分けず、1つの表に曜日の順（月〜日）で列を並べる（列は late.json で曜日順に並んでいる）
-    $('#summary').innerHTML = `<h2>${esc(cur.gname)}の深夜アニメ放送枠</h2><span class="range">${cur.y0} – ${cur.y1}</span><span class="count">21時〜翌5時・番組 ${cur.count} 本</span>`;
+    $('#summary').innerHTML = `<h2>${D.decades ? '' : esc(cur.gname) + 'の'}${esc(D.title)}</h2><span class="range">${cur.y0} – ${cur.y1}</span><span class="count">${esc(D.hours)}・番組 ${cur.count} 本</span>`;
     const g = $('#grid'), nq = (cur.y1 - cur.y0 + 1) * 4;
     const cols = cur.cols, ncol = cols.length, R0 = 3;
     g.style.gridTemplateColumns = `var(--dayw) var(--lqw) repeat(${Math.max(ncol, 1)}, var(--lcolw))`;
@@ -65,7 +71,7 @@
     // 曜日の帯
     for (let i = 0; i < ncol;) {
       let j = i; while (j < ncol && cols[j].day === cols[i].day) j++;
-      H.push(`<div class="lday" style="grid-row:1;grid-column:${3 + i}/span ${j - i}">${cols[i].day}曜深夜</div>`);
+      H.push(`<div class="lday" style="grid-row:1;grid-column:${3 + i}/span ${j - i}">${cols[i].day === '帯' ? '帯（平日）' : cols[i].day + '曜' + D.daysuf}</div>`);
       i = j;
     }
     cols.forEach(({cells}, ci) => {

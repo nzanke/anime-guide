@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>夕方のアニメ放送枠（2020年代）｜アニメ放送枠タイムテーブル</title>
+<meta name="description" content="2020年代の夕方（15時〜19時）のテレビアニメを、局ごと・3か月ごとの放送枠の表で見る。データは日本語版ウィキペディアの放送枠記事と作品記事から。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=BIZ+UDGothic:wght@400;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=20261111b">
+</head>
+<body data-src="evening.json">
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brand">
+      <span class="brand-kicker">ANIME ON AIR</span>
+      <h1>アニメ放送枠タイムテーブル</h1>
+    </div>
+    <nav class="controls" aria-label="表の切り替え">
+      <div class="seg">
+        <a href="index.html#golden-1990s">ゴールデン</a><a href="index.html#morning-1990s">朝・昼</a><a href="evening.html" aria-current="page">夕方</a><a href="late.html">深夜</a>
+      </div>
+      <div class="tabs" id="group" role="tablist"></div>
+      <div class="tabs" id="period" role="tablist"></div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="bar">
+    <section class="summary" id="summary"></section>
+    <div class="density" id="density" role="radiogroup" aria-label="表示の密度">
+      <button data-d="std" aria-checked="false" role="radio">標準</button>
+      <button data-d="compact" aria-checked="true" role="radio">コンパクト</button>
+    </div>
+  </div>
+  <div class="grid-wrap" id="gridWrap">
+    <div class="lgrid" id="grid"></div>
+  </div>
+  <section class="inner" id="inner"></section>
+  <p class="lnote">列は放送枠（同じ局・同じ曜日で、時刻の近い番組をつないだもの）。枠の名前は「局・曜日・時台」です。</p>
+  <section class="about">
+    <h2>夕方の表（2020年代）について</h2>
+    <ul>
+      <li>2020年代の夕方は1クール（3か月）の番組が多いので、深夜の表と同じく3か月ごとの表にしています。1960〜2010年代の夕方は半年ごとの表です（上の年代のタブ）。</li>
+      <li>15時から19時前に始まる番組です。1年を冬（1〜3月）・春（4〜6月）・夏（7〜9月）・秋（10〜12月）に分け、その3か月に30日以上放送された番組を入れています。再放送は入れていません。どの3か月にも30日以上放送されなかった番組は、表の下の開閉式の一覧に入れています。</li>
+      <li>局は系列でまとめています（読売テレビ→日本テレビ、朝日放送テレビ・名古屋テレビ→テレビ朝日、毎日放送→TBS、関西テレビ→フジテレビ、テレビ大阪・テレビ愛知→テレビ東京）。NHKはEテレを含みます。</li>
+      <li>枠の中で番組がない期間は「中断」、枠の最後の番組の後は「終了」と書いています。</li>
+      <li>データは日本語版ウィキペディアの放送枠記事と作品記事から書き写したもので、記事にない枠は入っていないことがあります。番組を押すと出典を見られます。</li>
+    </ul>
+    <p class="credit">出典：<a href="https://ja.wikipedia.org/" rel="noopener">ウィキペディア日本語版</a>（CC BY-SA 4.0）／ データ更新：<span id="gen"></span></p>
+  </section>
+</main>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <article class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <button class="sheet-close" data-close aria-label="閉じる">×</button>
+    <div class="sheet-station" id="sheetStation"></div>
+    <h3 id="sheetTitle"></h3>
+    <dl id="sheetBody"></dl>
+  </article>
+</div>
+<script src="late.js?v=20261111b"></script>
+</body>
+</html>

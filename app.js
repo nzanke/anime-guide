@@ -59,7 +59,7 @@
     const kinds = [...new Set(D.tables.map(t => t.kind))];
     $('#kind').innerHTML = kinds.map(k => `<button role="tab" aria-selected="${k === cur.kind}" data-k="${esc(k)}">${esc(k)}</button>`).join('') + '<a href="late.html">深夜</a>';
     const ts = D.tables.filter(t => t.kind === cur.kind);
-    $('#decade').innerHTML = ts.map(t => `<button role="tab" aria-selected="${t === cur}" data-t="${t.id}">${esc(t.label)}</button>`).join('');
+    $('#decade').innerHTML = ts.map(t => t.link ? `<a href="${t.link}">${esc(t.label)}</a>` : `<button role="tab" aria-selected="${t === cur}" data-t="${t.id}">${esc(t.label)}</button>`).join('');
     // 年代のタブが画面からはみ出すとき（スマホ）は、選んでいるタブが見える位置まで横に送る
     const sel = $('#decade [aria-selected="true"]'), bar = $('#decade');
     if (sel && bar.scrollWidth > bar.clientWidth) bar.scrollLeft = Math.max(0, sel.offsetLeft - bar.offsetLeft - 40);
@@ -107,6 +107,7 @@
   }
 
   function render() {
+    if (cur.link) { location.href = cur.link; return; }   // 2020年代の夕方は別ページ（3か月ごとの表）
     history.replaceState(null, '', '#' + cur.id);
     buildNav();
     const v = view(), years = v.b - v.a + 1, ncol = years * 2;
