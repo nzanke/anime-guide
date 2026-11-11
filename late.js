@@ -25,7 +25,7 @@
   function nav() {
     $('#group').innerHTML = D.groups.map(([k, n]) => `<button role="tab" aria-selected="${k === cur.group}" data-g="${k}">${esc(n)}</button>`).join('');
     const ps = D.charts.filter(c => c.group === cur.group);
-    $('#period').innerHTML = ps.map(c => `<button role="tab" aria-selected="${c === cur}" data-c="${c.id}">${c.y0}〜${String(c.y1).slice(2)}年</button>`).join('');
+    $('#period').innerHTML = ps.map(c => `<button role="tab" aria-selected="${c === cur}" data-c="${c.id}">${c.y1 - c.y0 < 4 ? c.y0 + "年〜" : c.y0 + "〜" + String(c.y1).slice(2) + "年"}</button>`).join('');
     const sel = $('#period [aria-selected="true"]'), bar = $('#period');
     if (sel && bar.scrollWidth > bar.clientWidth) bar.scrollLeft = Math.max(0, sel.offsetLeft - bar.offsetLeft - 40);
   }
