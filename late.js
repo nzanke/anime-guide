@@ -2,7 +2,7 @@
   'use strict';
   const $ = (s, el = document) => el.querySelector(s);
   const ACCENT = {'テレビ朝日':'--a-ex','日本テレビ':'--a-nt','TBS':'--a-tb','フジテレビ':'--a-cx','テレビ東京':'--a-tx','TOKYO MX':'--a-mx','テレビ神奈川':'--a-tk','NHK':'--a-nh'};
-  const CLS = s => s === 'TOKYO MX' ? 'MX' : s;
+  const CLS = s => s === 'TOKYO MX' ? 'MX' : ACCENT[s] ? s : 'SAT';   // 衛星放送の局はまとめて1色
   const SEASON = ['冬', '春', '夏', '秋'];
   const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const fmt = s => { if (!s) return '放送中'; const [y,m,d] = s.split('-').map(Number); return `${y}年${m}月${d}日`; };
@@ -57,7 +57,7 @@
     history.replaceState(null, '', '#' + cur.id);
     nav();
     // 曜日で分けず、1つの表に曜日の順（月〜日）で列を並べる（列は late.json で曜日順に並んでいる）
-    $('#summary').innerHTML = `<h2>${D.decades ? '' : esc(cur.gname) + 'の'}${esc(D.title)}</h2><span class="range">${cur.y0} – ${cur.y1}</span><span class="count">${esc(D.hours)}・番組 ${cur.count} 本</span>`;
+    $('#summary').innerHTML = `<h2>${cur.band ? 'BS・CS・WOWOWだけで放送されたアニメ' : (D.decades ? '' : esc(cur.gname) + 'の') + esc(D.title)}</h2><span class="range">${cur.y0} – ${cur.y1}</span><span class="count">${cur.band ? '時間帯なし（列は局）' : esc(D.hours)}・番組 ${cur.count} 本</span>`;
     const g = $('#grid'), nq = (cur.y1 - cur.y0 + 1) * 4;
     const cols = cur.cols, ncol = cols.length, R0 = 3;
     g.style.gridTemplateColumns = `var(--dayw) var(--lqw) repeat(${Math.max(ncol, 1)}, var(--lcolw))`;
@@ -71,7 +71,7 @@
     // 曜日の帯
     for (let i = 0; i < ncol;) {
       let j = i; while (j < ncol && cols[j].day === cols[i].day) j++;
-      H.push(`<div class="lday" style="grid-row:1;grid-column:${3 + i}/span ${j - i}">${cols[i].day === '帯' ? '帯（平日）' : cols[i].day + '曜' + D.daysuf}</div>`);
+      H.push(`<div class="lday" style="grid-row:1;grid-column:${3 + i}/span ${j - i}">${cur.band ? cols[i].day : cols[i].day === '帯' ? '帯（平日）' : cols[i].day + '曜' + D.daysuf}</div>`);
       i = j;
     }
     cols.forEach(({cells}, ci) => {
@@ -83,10 +83,10 @@
         for (let k = 0; k < c.n; k++) used.add(row + k);
         if (c.k === 'label') {
           const cls = c.r < 0 ? 'lc lhead lab' : 'lc lab';
-          H.push(`<div class="${cls}" style="grid-row:${row};grid-column:${col}"><span>${esc(c.t)}<i style="background:var(${ACCENT[c.st]})"></i></span></div>`);
+          H.push(`<div class="${cls}" style="grid-row:${row};grid-column:${col}"><span>${esc(c.t)}<i style="background:var(${ACCENT[c.st] || '--a-sat'})"></i></span></div>`);
         } else if (c.k === 'p') {
           const p = D.programs[c.p];
-          H.push(`<div class="lc" style="grid-row:${row}/span ${c.n};grid-column:${col}"><button class="prog st-${CLS(p.st)}" data-p="${c.p}" title="${esc(p.t)}（${esc(p.st)}）"><span style="-webkit-line-clamp:${c.n > 1 ? c.n * 2 + 1 : 2}">${wb(p.t)}</span><small>（${esc(p.d)}${p.slot ? esc(p.slot) : '深夜'}）</small></button></div>`);
+          H.push(`<div class="lc" style="grid-row:${row}/span ${c.n};grid-column:${col}"><button class="prog st-${CLS(p.st)}" data-p="${c.p}" title="${esc(p.t)}（${esc(p.st)}）"><span style="-webkit-line-clamp:${c.n > 1 ? c.n * 2 + 1 : 2}">${wb(p.t)}</span>${p.d ? `<small>（${esc(p.d)}${p.slot ? esc(p.slot) : '深夜'}）</small>` : ''}</button></div>`);
         } else {
           H.push(`<div class="lc mark${c.k === 'gap' ? ' gap' : ''}" style="grid-row:${row}/span ${c.n};grid-column:${col}">${esc(c.t)}</div>`);
         }
@@ -109,7 +109,7 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#sheet').hidden = true; });
   function open(id) {
     const p = D.programs[id];
-    const st = $('#sheetStation'); st.textContent = p.st; st.style.background = `var(${ACCENT[p.st]})`;
+    const st = $('#sheetStation'); st.textContent = p.st; st.style.background = `var(${ACCENT[p.st] || '--a-sat'})`;
     $('#sheetTitle').textContent = p.t;
     const row = (k, v) => v ? `<dt>${k}</dt><dd>${v}</dd>` : '';
     const wiki = 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(p.src.replace(/ /g, '_'));

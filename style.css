@@ -485,3 +485,7 @@ body.d-compact .lgrid .prog,body.d-fit .lgrid .prog{font-size:11px}
   .lgrid .prog,body.d-compact .lgrid .prog{font-size:8px;line-height:1.15;padding:1px 2px 1px 4px;min-height:calc(var(--lrowh) - 3px);font-feature-settings:"palt"}
   .lgrid .prog small{font-family:var(--ud);font-size:8px;letter-spacing:0;opacity:.75}
 }
+
+/* BS・CS・WOWOW の表（深夜のページ。2026年11月16日） */
+:root{--a-sat:#5b6b8c;--c-sat:#e3e6ee}
+.st-SAT{background:var(--c-sat)}.st-SAT::before{background:var(--a-sat)}
