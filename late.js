@@ -57,7 +57,7 @@
     history.replaceState(null, '', '#' + cur.id);
     nav();
     // 曜日で分けず、1つの表に曜日の順（月〜日）で列を並べる（列は late.json で曜日順に並んでいる）
-    $('#summary').innerHTML = `<h2>${cur.band ? 'BS・CS・WOWOWだけで放送されたアニメ' : (D.decades ? '' : esc(cur.gname) + 'の') + esc(D.title)}</h2><span class="range">${cur.y0} – ${cur.y1}</span><span class="count">${cur.band ? '時間帯なし（列は局）' : esc(D.hours)}・番組 ${cur.count} 本</span>`;
+    $('#summary').innerHTML = `<h2>${cur.band ? 'BS・CS・WOWOWだけで放送されたアニメ' : (D.decades ? '' : esc(cur.gname) + 'の') + esc(D.title)}</h2><span class="range">${cur.y0} – ${cur.y1}</span><span class="count">${cur.band ? '列は局（WOWOWは枠）・曜日・時刻' : esc(D.hours)}・番組 ${cur.count} 本</span>`;
     const g = $('#grid'), nq = (cur.y1 - cur.y0 + 1) * 4;
     const cols = cur.cols, ncol = cols.length, R0 = 3;
     g.style.gridTemplateColumns = `var(--dayw) var(--lqw) repeat(${Math.max(ncol, 1)}, var(--lcolw))`;
