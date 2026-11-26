@@ -53,7 +53,16 @@
     });
     return out;
   };
+  // 深夜のページは表ごとのファイル（late/<表のid>.json）に分けてある：見る表の分だけ読み、読んだ表は覚えておく（2026年11月26日）
   function render() {
+    if (!D.split || cur.cols) return draw();
+    const c = cur;
+    fetch('late/' + c.id + '.json?v=' + v, {cache: 'no-cache'}).then(r => r.json()).then(b => {
+      D.programs = Object.assign(D.programs || {}, b.programs); delete b.programs;
+      Object.assign(c, b); if (c === cur) draw();
+    });
+  }
+  function draw() {
     history.replaceState(null, '', '#' + cur.id);
     nav();
     // 曜日で分けず、1つの表に曜日の順（月〜日）で列を並べる（列は late.json で曜日順に並んでいる）
