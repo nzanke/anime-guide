@@ -18,6 +18,10 @@
   $('#density').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setDensity(b.dataset.d); });
   const v = (document.querySelector('script[src^="late.js"]').src.split('v=')[1] || '');
   const SRC = document.body.dataset.src || 'late.json';   // 夕方の2020年代（evening.html）は evening.json
+  // 深夜のページ：URL の #表のid（なければ既定の key-2005）の表のファイルを、目次（late.json）と同時に読み始める（2026年11月26日）
+  const load = id => fetch('late/' + id + '.json?v=' + v, {cache: 'no-cache'}).then(r => r.json());
+  const pre = {};
+  if (SRC === 'late.json') { const h = location.hash.slice(1) || 'key-2005'; if (/^[a-z]+-\d{4}$/.test(h)) pre[h] = load(h).catch(() => null); }
   fetch(SRC + '?v=' + v, {cache: 'no-cache'}).then(r => r.json()).then(j => {
     D = j; $('#gen').textContent = D.generated;
     cur = D.charts.find(c => c.id === location.hash.slice(1)) || D.charts.find(c => c.id === 'key-2005') || D.charts[0];
@@ -57,7 +61,8 @@
   function render() {
     if (!D.split || cur.cols) return draw();
     const c = cur;
-    fetch('late/' + c.id + '.json?v=' + v, {cache: 'no-cache'}).then(r => r.json()).then(b => {
+    const got = pre[c.id] ? pre[c.id].then(b => b || load(c.id)) : load(c.id); delete pre[c.id];
+    got.then(b => {
       D.programs = Object.assign(D.programs || {}, b.programs); delete b.programs;
       Object.assign(c, b); if (c === cur) draw();
     });
